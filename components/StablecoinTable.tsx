@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { ChainIcon } from "@/components/ChainIcon";
 import type { Stablecoin } from "@/lib/stablecoins";
 
+type RankedCoin = Stablecoin & { rank: number };
+
 function formatUsd(usd: number): string {
   if (usd >= 1_000_000_000) return `$${(usd / 1_000_000_000).toFixed(2)}B`;
   if (usd >= 1_000_000) return `$${(usd / 1_000_000).toFixed(1)}M`;
@@ -99,9 +101,16 @@ function matches(coin: Stablecoin, q: string): boolean {
 export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
   const [query, setQuery] = useState("");
 
+  // Assign each coin its original market-cap rank before filtering, so the
+  // number stays meaningful when the user searches.
+  const ranked = useMemo<RankedCoin[]>(
+    () => rows.map((coin, i) => ({ ...coin, rank: i + 1 })),
+    [rows],
+  );
+
   const filtered = useMemo(
-    () => rows.filter((coin) => matches(coin, query.trim())),
-    [rows, query],
+    () => ranked.filter((coin) => matches(coin, query.trim())),
+    [ranked, query],
   );
 
   return (
@@ -126,6 +135,7 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
         <table className="min-w-full divide-y divide-[var(--border)] text-sm">
           <thead className="bg-black/20">
             <tr className="text-left text-xs uppercase tracking-wider text-[var(--muted)]">
+              <th className="w-12 px-3 py-3 text-right font-medium">#</th>
               <th className="px-4 py-3 font-medium">Token</th>
               <th className="px-4 py-3 font-medium">Name / Issuer</th>
               <th className="px-4 py-3 font-medium">Currency</th>
@@ -138,7 +148,7 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
             {filtered.length === 0 ? (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="px-4 py-8 text-center text-[var(--muted)]"
                 >
                   No stablecoins match &quot;{query}&quot;.
@@ -147,6 +157,9 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
             ) : (
               filtered.map((coin) => (
                 <tr key={coin.symbol} className="hover:bg-white/[0.02]">
+                  <td className="w-12 px-3 py-4 text-right align-top font-mono text-xs text-[var(--muted)]">
+                    {coin.rank}
+                  </td>
                   <td className="px-4 py-4 align-top">
                     <div className="font-semibold">{coin.symbol}</div>
                   </td>
