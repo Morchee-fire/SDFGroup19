@@ -1,9 +1,10 @@
 import type { Stablecoin } from "@/lib/stablecoins";
 
-function formatTvl(usd: number): string {
+function formatMarketCap(usd: number): string {
   if (usd >= 1_000_000_000) return `$${(usd / 1_000_000_000).toFixed(2)}B`;
   if (usd >= 1_000_000) return `$${(usd / 1_000_000).toFixed(1)}M`;
   if (usd >= 1_000) return `$${(usd / 1_000).toFixed(0)}K`;
+  if (usd === 0) return "—";
   return `$${usd.toLocaleString()}`;
 }
 
@@ -25,8 +26,8 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
             <th className="px-4 py-3 font-medium">Currency</th>
             <th className="px-4 py-3 font-medium">Issuer</th>
             <th className="px-4 py-3 font-medium">Chains</th>
-            <th className="px-4 py-3 text-right font-medium">TVL (USD)</th>
-            <th className="px-4 py-3 font-medium">Corridors</th>
+            <th className="px-4 py-3 text-right font-medium">Market Cap</th>
+            <th className="px-4 py-3 font-medium">Yield</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-[var(--border)]">
@@ -34,25 +35,12 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
             <tr key={coin.symbol} className="hover:bg-white/[0.02]">
               <td className="px-4 py-4 align-top">
                 <div className="font-semibold">{coin.symbol}</div>
-                <div className="text-xs text-[var(--muted)]">{coin.name}</div>
+                <div className="text-xs text-[var(--muted)]">{coin.category}</div>
               </td>
               <td className="px-4 py-4 align-top">
                 <Pill>{coin.currency}</Pill>
               </td>
-              <td className="px-4 py-4 align-top">
-                {coin.website ? (
-                  <a
-                    href={coin.website}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[var(--accent)] hover:underline"
-                  >
-                    {coin.issuer}
-                  </a>
-                ) : (
-                  coin.issuer
-                )}
-              </td>
+              <td className="px-4 py-4 align-top">{coin.name}</td>
               <td className="px-4 py-4 align-top">
                 <div className="flex flex-wrap gap-1.5">
                   {coin.chains.map((chain) => (
@@ -61,14 +49,16 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
                 </div>
               </td>
               <td className="px-4 py-4 text-right align-top font-mono">
-                {formatTvl(coin.tvlUsd)}
+                {formatMarketCap(coin.marketCapUsd)}
               </td>
               <td className="px-4 py-4 align-top">
-                <div className="flex flex-wrap gap-1.5">
-                  {coin.corridors.map((corridor) => (
-                    <Pill key={corridor}>{corridor}</Pill>
-                  ))}
-                </div>
+                {coin.yieldBearing ? (
+                  <span className="text-green-400 text-xs">
+                    {coin.yieldSource || "Yes"}
+                  </span>
+                ) : (
+                  <span className="text-[var(--muted)]">—</span>
+                )}
               </td>
             </tr>
           ))}
