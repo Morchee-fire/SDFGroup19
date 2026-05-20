@@ -1,3 +1,4 @@
+import { ChainIcon } from "@/components/ChainIcon";
 import type { Stablecoin } from "@/lib/stablecoins";
 
 function formatUsd(usd: number): string {
@@ -14,6 +15,22 @@ function Pill({ children }: { children: React.ReactNode }) {
       {children}
     </span>
   );
+}
+
+function ChainBadge({ name }: { name: string }) {
+  const icon = ChainIcon({ name, size: 22 });
+  if (icon) {
+    return (
+      <span
+        className="inline-flex h-[22px] items-center"
+        title={name}
+        aria-label={name}
+      >
+        {icon}
+      </span>
+    );
+  }
+  return <Pill>{name}</Pill>;
 }
 
 export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
@@ -36,14 +53,16 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
               <td className="px-4 py-4 align-top">
                 <div className="font-semibold">{coin.symbol}</div>
               </td>
-              <td className="px-4 py-4 align-top text-[var(--muted)]">{coin.name}</td>
+              <td className="px-4 py-4 align-top text-[var(--muted)]">
+                {coin.name}
+              </td>
               <td className="px-4 py-4 align-top">
                 <Pill>{coin.currency}</Pill>
               </td>
               <td className="px-4 py-4 align-top">
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap items-center gap-2">
                   {coin.chains.map((chain) => (
-                    <Pill key={chain}>{chain}</Pill>
+                    <ChainBadge key={chain} name={chain} />
                   ))}
                 </div>
               </td>
