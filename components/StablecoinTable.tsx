@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import { ChainIcon } from "@/components/ChainIcon";
 import type { Stablecoin } from "@/lib/stablecoins";
 
@@ -5,7 +8,7 @@ function formatUsd(usd: number): string {
   if (usd >= 1_000_000_000) return `$${(usd / 1_000_000_000).toFixed(2)}B`;
   if (usd >= 1_000_000) return `$${(usd / 1_000_000).toFixed(1)}M`;
   if (usd >= 1_000) return `$${(usd / 1_000).toFixed(0)}K`;
-  if (usd === 0) return "—";
+  if (usd === 0) return "-";
   return `$${usd.toLocaleString()}`;
 }
 
@@ -76,49 +79,102 @@ function ChainBadge({ name }: { name: string }) {
   return <Pill>{name}</Pill>;
 }
 
+function matches(coin: Stablecoin, q: string): boolean {
+  if (!q) return true;
+  const needle = q.toLowerCase();
+  const haystack = [
+    coin.symbol,
+    coin.name,
+    coin.currency,
+    coin.category,
+    coin.yieldSource,
+    ...coin.chains,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  return haystack.includes(needle);
+}
+
 export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(
+    () => rows.filter((coin) => matches(coin, query.trim())),
+    [rows, query],
+  );
+
   return (
-    <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]">
-      <table className="min-w-full divide-y divide-[var(--border)] text-sm">
-        <thead className="bg-black/20">
-          <tr className="text-left text-xs uppercase tracking-wider text-[var(--muted)]">
-            <th className="px-4 py-3 font-medium">Token</th>
-            <th className="px-4 py-3 font-medium">Issuer</th>
-            <th className="px-4 py-3 font-medium">Currency</th>
-            <th className="px-4 py-3 font-medium">Chains</th>
-            <th className="px-4 py-3 text-right font-medium">TVL</th>
-            <th className="px-4 py-3 text-right font-medium">Payments</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-[var(--border)]">
-          {rows.map((coin) => (
-            <tr key={coin.symbol} className="hover:bg-white/[0.02]">
-              <td className="px-4 py-4 align-top">
-                <div className="font-semibold">{coin.symbol}</div>
-              </td>
-              <td className="px-4 py-4 align-top text-[var(--muted)]">
-                {coin.name}
-              </td>
-              <td className="px-4 py-4 align-top">
-                <CurrencyPill currency={coin.currency} symbol={coin.symbol} />
-              </td>
-              <td className="px-4 py-4 align-top">
-                <div className="flex flex-wrap items-center gap-2">
-                  {coin.chains.map((chain) => (
-                    <ChainBadge key={chain} name={chain} />
-                  ))}
-                </div>
-              </td>
-              <td className="px-4 py-4 text-right align-top font-mono">
-                {formatUsd(coin.marketCapUsd)}
-              </td>
-              <td className="px-4 py-4 text-right align-top font-mono text-[var(--muted)]">
-                —
-              </td>
+    <div className="space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-sm">
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by symbol, currency, issuer, or chain..."
+            className="w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:outline-none"
+            aria-label="Search stablecoins"
+          />
+        </div>
+        <span className="text-xs text-[var(--muted)]">
+          Showing {filtered.length} of {rows.length}
+        </span>
+      </div>
+
+      <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]">
+        <table className="min-w-full divide-y divide-[var(--border)] text-sm">
+          <thead className="bg-black/20">
+            <tr className="text-left text-xs uppercase tracking-wider text-[var(--muted)]">
+              <th className="px-4 py-3 font-medium">Token</th>
+              <th className="px-4 py-3 font-medium">Name / Issuer</th>
+              <th className="px-4 py-3 font-medium">Currency</th>
+              <th className="px-4 py-3 font-medium">Chains</th>
+              <th className="px-4 py-3 text-right font-medium">Market Cap</th>
+              <th className="px-4 py-3 text-right font-medium">Payments</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-[var(--border)]">
+            {filtered.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-4 py-8 text-center text-[var(--muted)]"
+                >
+                  No stablecoins match &quot;{query}&quot;.
+                </td>
+              </tr>
+            ) : (
+              filtered.map((coin) => (
+                <tr key={coin.symbol} className="hover:bg-white/[0.02]">
+                  <td className="px-4 py-4 align-top">
+                    <div className="font-semibold">{coin.symbol}</div>
+                  </td>
+                  <td className="px-4 py-4 align-top text-[var(--muted)]">
+                    {coin.name}
+                  </td>
+                  <td className="px-4 py-4 align-top">
+                    <CurrencyPill currency={coin.currency} symbol={coin.symbol} />
+                  </td>
+                  <td className="px-4 py-4 align-top">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {coin.chains.map((chain) => (
+                        <ChainBadge key={chain} name={chain} />
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-right align-top font-mono">
+                    {formatUsd(coin.marketCapUsd)}
+                  </td>
+                  <td className="px-4 py-4 text-right align-top font-mono text-[var(--muted)]">
+                    -
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

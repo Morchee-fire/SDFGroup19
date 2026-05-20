@@ -1,7 +1,7 @@
 /**
  * Inline brand-mark SVGs for blockchain networks.
  *
- * Each icon renders in a 24×24 box with a circular brand-color background and
+ * Each icon renders in a 24x24 box with a circular brand-color background and
  * a simplified glyph in white. The shapes approximate the canonical chain
  * brand marks well enough to be recognizable in a dense table view.
  *
@@ -40,7 +40,7 @@ function Wrap({
   );
 }
 
-// — Individual chain marks —
+// --- Individual chain marks ---
 
 const Ethereum = ({ size }: IconProps) => (
   <Wrap bg="#627EEA" size={size} title="Ethereum">
@@ -165,10 +165,7 @@ const Hedera = ({ size }: IconProps) => (
 
 const Zilliqa = ({ size }: IconProps) => (
   <Wrap bg="#49C1BF" size={size} title="Zilliqa">
-    <path
-      fill="#FFF"
-      d="M9 11h14l-9 6h9l-14-2 9-6H9v2zm0 8h14v2H9v-2z"
-    />
+    <path fill="#FFF" d="M9 11h14l-9 6h9l-14-2 9-6H9v2zm0 8h14v2H9v-2z" />
   </Wrap>
 );
 
@@ -182,7 +179,134 @@ const LayerZero = ({ size }: IconProps) => (
   </Wrap>
 );
 
-// — Registry —
+const Celo = ({ size }: IconProps) => (
+  <Wrap bg="#FBCC5C" size={size} title="Celo">
+    <g fill="none" stroke="#000" strokeWidth="2.2">
+      <circle cx="13" cy="16" r="6" />
+      <circle cx="19" cy="16" r="6" />
+    </g>
+  </Wrap>
+);
+
+const Gnosis = ({ size }: IconProps) => (
+  <Wrap bg="#04795B" size={size} title="Gnosis">
+    <g fill="#FFF">
+      <circle cx="12" cy="12" r="3" />
+      <circle cx="20" cy="12" r="3" />
+      <circle cx="12" cy="20" r="3" />
+      <circle cx="20" cy="20" r="3" />
+    </g>
+  </Wrap>
+);
+
+const Injective = ({ size }: IconProps) => (
+  <Wrap bg="#00F2FE" size={size} title="Injective">
+    <path
+      fill="#000"
+      d="M16 6c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10c0-3-1.4-5.5-3.5-7.3L19 12c1.2 1.1 2 2.6 2 4.3 0 2.8-2.2 5-5 5s-5-2.2-5-5 2.2-5 5-5l3.5-3.5C18.2 6.7 17.2 6 16 6z"
+    />
+  </Wrap>
+);
+
+const Kaia = ({ size }: IconProps) => (
+  <Wrap bg="#BFF009" size={size} title="Kaia">
+    <path
+      fill="#000"
+      d="M10 8h3v6l5-6h4l-5.5 6.5L22 24h-4l-4-6.5-1 1.2V24h-3V8z"
+    />
+  </Wrap>
+);
+
+const Monad = ({ size }: IconProps) => (
+  <Wrap bg="#836EF9" size={size} title="Monad">
+    <g fill="#FFF">
+      <ellipse cx="16" cy="9" rx="3" ry="5" />
+      <ellipse cx="23" cy="16" rx="5" ry="3" />
+      <ellipse cx="16" cy="23" rx="3" ry="5" />
+      <ellipse cx="9" cy="16" rx="5" ry="3" />
+    </g>
+  </Wrap>
+);
+
+const Moonbeam = ({ size }: IconProps) => (
+  <Wrap bg="#E1147B" size={size} title="Moonbeam">
+    <g fill="#FFF">
+      <path d="M21 16a5 5 0 11-5-5 4 4 0 105 5z" />
+      <circle cx="11" cy="11" r="1" />
+      <circle cx="22" cy="12" r="1" />
+      <circle cx="23" cy="20" r="1" />
+      <circle cx="10" cy="22" r="1" />
+    </g>
+  </Wrap>
+);
+
+const Redbelly = ({ size }: IconProps) => (
+  <Wrap bg="#C8102E" size={size} title="Redbelly">
+    <path
+      fill="#FFF"
+      d="M8 11c2-2 4-2 6 0s4 2 6 0 4-2 6 0v3c-2-2-4-2-6 0s-4 2-6 0-4-2-6 0v-3zm0 5c2-2 4-2 6 0s4 2 6 0 4-2 6 0v3c-2-2-4-2-6 0s-4 2-6 0-4-2-6 0v-3zm0 5c2-2 4-2 6 0s4 2 6 0 4-2 6 0v2H8v-2z"
+    />
+  </Wrap>
+);
+
+const Ronin = ({ size }: IconProps) => (
+  <Wrap bg="#1273EA" size={size} title="Ronin">
+    <path
+      fill="#FFF"
+      d="M10 8h7a4 4 0 014 4c0 1.7-1 3.2-2.5 3.7L22 24h-3.5l-3-7H13v7h-3V8zm3 3v3h4a1.5 1.5 0 100-3h-4z"
+    />
+  </Wrap>
+);
+
+const WorldChain = ({ size }: IconProps) => (
+  <Wrap bg="#000" size={size} title="World Chain">
+    <g fill="none" stroke="#FFF" strokeWidth="1.8">
+      <circle cx="16" cy="16" r="7" />
+      <ellipse cx="16" cy="16" rx="7" ry="3" />
+      <line x1="9" y1="16" x2="23" y2="16" />
+      <line x1="16" y1="9" x2="16" y2="23" />
+    </g>
+  </Wrap>
+);
+
+const XDC = ({ size }: IconProps) => (
+  <Wrap bg="#F7B500" size={size} title="XDC">
+    <path
+      fill="#000"
+      d="M9 9h3.5l3.5 5 3.5-5H23l-5 7 5 7h-3.5l-3.5-5-3.5 5H9l5-7-5-7z"
+    />
+  </Wrap>
+);
+
+const XRPLedger = ({ size }: IconProps) => (
+  <Wrap bg="#000" size={size} title="XRP Ledger">
+    <path
+      fill="#FFF"
+      d="M9 9l5 5a3 3 0 004 0l5-5h-3l-3.5 3.5a1.5 1.5 0 01-2 0L11 9H9zm0 14l5-5a3 3 0 014 0l5 5h-3l-3.5-3.5a1.5 1.5 0 00-2 0L11 23H9z"
+    />
+  </Wrap>
+);
+
+const AssetChain = ({ size }: IconProps) => (
+  <Wrap bg="#FF6B35" size={size} title="AssetChain">
+    <g fill="none" stroke="#FFF" strokeWidth="2" strokeLinecap="round">
+      <rect x="9" y="12" width="6" height="8" rx="3" />
+      <rect x="17" y="12" width="6" height="8" rx="3" />
+      <line x1="13" y1="16" x2="19" y2="16" />
+    </g>
+  </Wrap>
+);
+
+const Bantu = ({ size }: IconProps) => (
+  <Wrap bg="#1A8A5C" size={size} title="Bantu">
+    <path
+      fill="#FFF"
+      d="M10 8h6a3.5 3.5 0 012.5 6 4 4 0 01-2 7.5H10V8zm3 3v3.5h3a1.5 1.5 0 100-3.5h-3zm0 6v4.5h3.5a2 2 0 100-4.5H13z"
+    />
+  </Wrap>
+);
+
+// --- Registry ---
 
 const CHAIN_ICONS: Record<string, (p: IconProps) => React.ReactElement> = {
   ethereum: Ethereum,
@@ -201,29 +325,54 @@ const CHAIN_ICONS: Record<string, (p: IconProps) => React.ReactElement> = {
   hedera: Hedera,
   zilliqa: Zilliqa,
   layerzero: LayerZero,
+  celo: Celo,
+  gnosis: Gnosis,
+  injective: Injective,
+  kaia: Kaia,
+  monad: Monad,
+  moonbeam: Moonbeam,
+  redbelly: Redbelly,
+  ronin: Ronin,
+  "world chain": WorldChain,
+  xdc: XDC,
+  "xrp ledger": XRPLedger,
+  assetchain: AssetChain,
+  bantu: Bantu,
 };
 
-// Common aliases — map sheet-side variants to canonical keys.
+// Common aliases - map sheet-side variants to canonical keys.
 const NAME_ALIASES: Record<string, string> = {
   "avalanche c-chain": "avalanche",
-  "avax": "avalanche",
+  avax: "avalanche",
   "binance smart chain": "bnb chain",
-  "binance": "bnb chain",
-  "matic": "polygon",
+  binance: "bnb chain",
+  matic: "polygon",
   "polygon pos": "polygon",
-  "eth": "ethereum",
+  eth: "ethereum",
   "arbitrum one": "arbitrum",
-  "trx": "tron",
+  trx: "tron",
+  worldchain: "world chain",
+  xrp: "xrp ledger",
+  "asset chain": "assetchain",
+  klaytn: "kaia",
 };
 
+/**
+ * Lowercase, trim, and strip stray surrounding punctuation. The sheet parser
+ * occasionally leaves trailing ")" or "(" on chain names (e.g. "Ethereum)"
+ * from a malformed parenthetical), which we want to forgive here.
+ */
 function normalize(name: string): string {
-  return name.trim().toLowerCase();
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/^[^a-z0-9]+/, "")
+    .replace(/[^a-z0-9]+$/, "");
 }
 
 /**
  * Looks up the icon for a chain name (case-insensitive, alias-aware).
- * Returns null if no icon is registered for this chain — the caller should
- * render a text pill as fallback.
+ * Returns null if no icon is registered for this chain.
  */
 export function ChainIcon({
   name,
