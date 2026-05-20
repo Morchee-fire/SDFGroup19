@@ -24,8 +24,7 @@ export default async function Home() {
         <p className="mt-4 max-w-2xl text-[var(--muted)]">
           Stable Reef is a working directory of fiat- and treasury-backed
           stablecoins outside of USD and EUR — the chains they live on and
-          approximate market cap. Data refreshes every 4 hours from the source
-          sheet.
+          approximate market cap.
         </p>
       </header>
 
