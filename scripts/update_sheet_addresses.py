@@ -2,13 +2,18 @@
 """
 Add per-chain contract address columns to the stablecoin Google Sheet.
 
-Auth: uses Application Default Credentials.
-Run:  gcloud auth application-default login   (once)
-      python3 scripts/update_sheet_addresses.py
+One-time auth setup (takes ~2 min):
+  1. Go to https://console.cloud.google.com/apis/credentials
+  2. Create a project → Enable Google Sheets API
+  3. Create credentials → OAuth client ID → Desktop App → Download JSON
+  4. Save the file to: ~/.config/gspread/credentials.json
+  5. Run this script — it opens a browser to authorise on the first run.
+     The token is cached, so subsequent runs need no browser.
+
+Run:  python3 scripts/update_sheet_addresses.py
 """
 
 import gspread
-from google.auth import default
 
 SHEET_ID = "1W6-vyIHYn7_mWmfjcemLRT7nSKZmaBRsd6tDaf09aws"
 
@@ -154,8 +159,7 @@ CHAINS = [
 
 
 def main() -> None:
-    creds, _ = default(scopes=["https://www.googleapis.com/auth/spreadsheets"])
-    gc = gspread.authorize(creds)
+    gc = gspread.oauth()  # opens browser on first run; token cached after that
     ws = gc.open_by_key(SHEET_ID).sheet1
 
     all_values = ws.get_all_values()

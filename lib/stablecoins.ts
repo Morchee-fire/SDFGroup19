@@ -70,15 +70,13 @@ function parseCsv(csv: string): Stablecoin[] {
         yieldBearing: cols[COL_YIELD]?.trim().toLowerCase() === "yes",
         yieldSource: cols[COL_YIELD_SRC]?.trim() ?? "",
         marketCapUsd: parseMarketCap(cols[COL_MARKET_CAP]?.trim() ?? ""),
-        chains: (cols[COL_CHAINS]?.trim() ?? "")
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
+        chains: parseChains(cols[COL_CHAINS]?.trim() ?? ""),
         contractAddresses,
         source: cols[COL_SOURCE]?.trim() ?? "",
       } satisfies Stablecoin;
     })
-    .filter((s): s is Stablecoin => s !== null);
+    .filter((s): s is Stablecoin => s !== null)
+    .sort((a, b) => b.marketCapUsd - a.marketCapUsd);
 }
 
 function splitCsvLine(line: string): string[] {
@@ -103,6 +101,14 @@ function splitCsvLine(line: string): string[] {
   }
   result.push(current);
   return result;
+}
+
+function parseChains(s: string): string[] {
+  // Strip parenthetical notes e.g. "Polygon (issuer also lists ...)" → "Polygon"
+  return s
+    .split(",")
+    .map((c) => c.replace(/\s*\(.*?\)/g, "").trim())
+    .filter(Boolean);
 }
 
 function parseMarketCap(s: string): number {
