@@ -22,6 +22,7 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
       <table className="min-w-full divide-y divide-[var(--border)] text-sm">
         <thead className="bg-black/20">
           <tr className="text-left text-xs uppercase tracking-wider text-[var(--muted)]">
+            <th className="px-4 py-3 font-medium w-8 text-right">#</th>
             <th className="px-4 py-3 font-medium">Stablecoin</th>
             <th className="px-4 py-3 font-medium">Currency</th>
             <th className="px-4 py-3 font-medium">Issuer</th>
@@ -31,16 +32,19 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-[var(--border)]">
-          {rows.map((coin) => (
+          {rows.map((coin, i) => (
             <tr key={coin.symbol} className="hover:bg-white/[0.02]">
+              <td className="px-4 py-4 align-top text-right text-[var(--muted)] tabular-nums">
+                {i + 1}
+              </td>
               <td className="px-4 py-4 align-top">
                 <div className="font-semibold">{coin.symbol}</div>
-                <div className="text-xs text-[var(--muted)]">{coin.category}</div>
+                <div className="text-xs text-[var(--muted)]">{coin.currency} stablecoin</div>
               </td>
               <td className="px-4 py-4 align-top">
                 <Pill>{coin.currency}</Pill>
               </td>
-              <td className="px-4 py-4 align-top">{coin.name}</td>
+              <td className="px-4 py-4 align-top text-[var(--muted)]">{coin.name}</td>
               <td className="px-4 py-4 align-top">
                 <div className="flex flex-wrap gap-1.5">
                   {coin.chains.map((chain) => (
