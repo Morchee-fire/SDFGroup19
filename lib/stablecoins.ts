@@ -1,18 +1,6 @@
 const SHEET_ID = "1W6-vyIHYn7_mWmfjcemLRT7nSKZmaBRsd6tDaf09aws";
 const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
 
-// Fixed column indices matching the sheet layout (A–I)
-const COL_CATEGORY = 0;
-const COL_TICKER = 1;
-const COL_NAME = 2;
-const COL_CURRENCY = 3;
-const COL_YIELD = 4;
-const COL_YIELD_SRC = 5;
-const COL_MARKET_CAP = 6;
-const COL_CHAINS = 7;
-const COL_SOURCE = 8;
-// Columns J onwards are per-chain contract addresses; headers = chain names.
-
 export type Stablecoin = {
   category: string;
   symbol: string;
@@ -28,7 +16,7 @@ export type Stablecoin = {
 
 export async function fetchStablecoins(): Promise<Stablecoin[]> {
   const res = await fetch(SHEET_CSV_URL, {
-    next: { revalidate: 4 * 60 * 60 }, // revalidate every 4 hours
+    next: { revalidate: 4 * 60 * 60 },
   });
   if (!res.ok) throw new Error(`Sheet fetch failed: ${res.status}`);
   return parseCsv(await res.text());
@@ -36,47 +24,74 @@ export async function fetchStablecoins(): Promise<Stablecoin[]> {
 
 // — CSV parsing —
 
+// Known base column header fragments (lowercase). Anything else is a chain address column.
+const BASE_HEADERS = new Set([
+  "#", "category", "ticker", "name", "currency",
+  "yield-bearing", "yield source", "cut off", "market cap", "chains", "source",
+]);
+
 function parseCsv(csv: string): Stablecoin[] {
   const lines = csv.split(/\r?\n/).filter((l) => l.trim());
   if (lines.length < 2) return [];
 
-  const headers = splitCsvLine(lines[0]);
+  const headers = splitCsvLine(lines[0]).map((h) => h.trim());
 
-  // Columns J+ hold chain contract addresses; header = chain name
+  // Find a column index by partial header match
+  const col = (fragment: string) =>
+    headers.findIndex((h) => h.toLowerCase().includes(fragment.toLowerCase()));
+
+  const iCategory  = col("category");
+  const iTicker    = col("ticker");
+  const iName      = col("name");
+  const iCurrency  = col("currency");
+  const iYield     = col("yield-bearing");
+  const iYieldSrc  = col("yield source");
+  const iMarketCap = col("market cap");
+  const iChains    = col("chains");
+  const iSource    = col("source");
+
+  // Any column whose header doesn't match a known base header is a chain address column
+  const baseIdxs = new Set([iCategory, iTicker, iName, iCurrency, iYield, iYieldSrc, iMarketCap, iChains, iSource]);
   const chainCols: { chain: string; idx: number }[] = [];
-  for (let i = 9; i < headers.length; i++) {
-    const h = headers[i].trim();
-    if (h) chainCols.push({ chain: h, idx: i });
+  for (let i = 0; i < headers.length; i++) {
+    if (baseIdxs.has(i)) continue;
+    const h = headers[i].toLowerCase();
+    if (!h || BASE_HEADERS.has(h) || [...BASE_HEADERS].some((b) => h.includes(b))) continue;
+    chainCols.push({ chain: headers[i], idx: i });
   }
 
   return lines
     .slice(1)
     .map((line) => {
       const cols = splitCsvLine(line);
-      const symbol = cols[COL_TICKER]?.trim() ?? "";
+      const symbol = get(cols, iTicker);
       if (!symbol) return null;
 
       const contractAddresses: Record<string, string> = {};
       for (const { chain, idx } of chainCols) {
-        const addr = cols[idx]?.trim();
+        const addr = get(cols, idx);
         if (addr) contractAddresses[chain] = addr;
       }
 
       return {
-        category: cols[COL_CATEGORY]?.trim() ?? "",
+        category:     get(cols, iCategory),
         symbol,
-        name: cols[COL_NAME]?.trim() ?? "",
-        currency: cols[COL_CURRENCY]?.trim() ?? "",
-        yieldBearing: cols[COL_YIELD]?.trim().toLowerCase() === "yes",
-        yieldSource: cols[COL_YIELD_SRC]?.trim() ?? "",
-        marketCapUsd: parseMarketCap(cols[COL_MARKET_CAP]?.trim() ?? ""),
-        chains: parseChains(cols[COL_CHAINS]?.trim() ?? ""),
+        name:         get(cols, iName),
+        currency:     parseCurrency(get(cols, iCurrency)),
+        yieldBearing: get(cols, iYield).toLowerCase() === "yes",
+        yieldSource:  get(cols, iYieldSrc),
+        marketCapUsd: parseMarketCap(get(cols, iMarketCap)),
+        chains:       parseChains(get(cols, iChains)),
         contractAddresses,
-        source: cols[COL_SOURCE]?.trim() ?? "",
+        source:       get(cols, iSource),
       } satisfies Stablecoin;
     })
     .filter((s): s is Stablecoin => s !== null)
     .sort((a, b) => b.marketCapUsd - a.marketCapUsd);
+}
+
+function get(cols: string[], idx: number): string {
+  return idx >= 0 ? (cols[idx]?.trim() ?? "") : "";
 }
 
 function splitCsvLine(line: string): string[] {
@@ -86,21 +101,21 @@ function splitCsvLine(line: string): string[] {
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
     if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
+      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+      else inQuotes = !inQuotes;
     } else if (ch === "," && !inQuotes) {
-      result.push(current);
-      current = "";
+      result.push(current); current = "";
     } else {
       current += ch;
     }
   }
   result.push(current);
   return result;
+}
+
+function parseCurrency(s: string): string {
+  // "BRL (Brazilian Real)" → "BRL", "USD" → "USD"
+  return s.split(/[\s(]/)[0].trim();
 }
 
 function parseChains(s: string): string[] {
@@ -112,8 +127,9 @@ function parseChains(s: string): string[] {
 }
 
 function parseMarketCap(s: string): number {
-  const clean = s.replace(/[~$,\s]/g, "").toUpperCase();
-  if (!clean) return 0;
+  if (!s || s.toLowerCase() === "limited") return 0;
+  // Handle ranges like "~$18-26,000,000" — take the lower bound
+  const clean = s.replace(/[~$,\s]/g, "").toUpperCase().split("-")[0];
   if (clean.endsWith("B")) return parseFloat(clean) * 1_000_000_000;
   if (clean.endsWith("M")) return parseFloat(clean) * 1_000_000;
   if (clean.endsWith("K")) return parseFloat(clean) * 1_000;
