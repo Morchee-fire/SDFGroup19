@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { ChainIcon } from "@/components/ChainIcon";
 import type { Stablecoin } from "@/lib/stablecoins";
-import { formatHolders, getMetrics } from "@/lib/tokenMetrics";
+import { getMetrics } from "@/lib/tokenMetrics";
 
 type RankedCoin = Stablecoin & { rank: number };
 
@@ -143,14 +143,13 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
               <th className="px-4 py-3 font-medium">Chains</th>
               <th className="px-4 py-3 text-right font-medium">Market Cap</th>
               <th className="px-4 py-3 text-right font-medium">30 Day Payment Volume</th>
-              <th className="px-4 py-3 text-right font-medium">Holders</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border)]">
             {filtered.length === 0 ? (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={7}
                   className="px-4 py-8 text-center text-[var(--muted)]"
                 >
                   No stablecoins match &quot;{query}&quot;.
@@ -189,13 +188,6 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
                       }`}
                     >
                       {m.volume30dUsd ? formatUsd(m.volume30dUsd) : "-"}
-                    </td>
-                    <td
-                      className={`px-4 py-4 text-right align-top font-mono ${
-                        m.holders ? "" : "text-[var(--muted)]"
-                      }`}
-                    >
-                      {formatHolders(m.holders)}
                     </td>
                   </tr>
                 );
