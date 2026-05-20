@@ -1,9 +1,21 @@
 import Logo from "@/components/Logo";
 import StablecoinTable from "@/components/StablecoinTable";
 import { fetchStablecoins } from "@/lib/stablecoins";
+import { fetchAllMarketCaps } from "@/lib/marketcap";
 
 export default async function Home() {
-  const stablecoins = await fetchStablecoins();
+  const [stablecoins, marketCaps] = await Promise.all([
+    fetchStablecoins(),
+    fetchAllMarketCaps().catch(() => ({} as Record<string, number>)),
+  ]);
+
+  const coins = stablecoins.map((c) => ({
+    ...c,
+    marketCapUsd:
+      (marketCaps[c.symbol] ?? 0) > 0
+        ? marketCaps[c.symbol]
+        : c.marketCapUsd,
+  }));
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
@@ -28,11 +40,11 @@ export default async function Home() {
         </p>
       </header>
 
-      <StablecoinTable rows={stablecoins} />
+      <StablecoinTable rows={coins} />
 
       <footer className="mt-12 flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted)]">
         <span>
-          {stablecoins.length} stablecoins listed · Market cap figures are
+          {coins.length} stablecoins listed · Market cap figures are
           approximate.
         </span>
         <span>© {new Date().getFullYear()} Stable Reef</span>
