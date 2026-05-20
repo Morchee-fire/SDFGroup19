@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { ChainIcon } from "@/components/ChainIcon";
 import type { Stablecoin } from "@/lib/stablecoins";
+import { getMetrics } from "@/lib/tokenMetrics";
 
 type RankedCoin = Stablecoin & { rank: number };
 
@@ -141,7 +142,7 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
               <th className="px-4 py-3 font-medium">Currency</th>
               <th className="px-4 py-3 font-medium">Chains</th>
               <th className="px-4 py-3 text-right font-medium">Market Cap</th>
-              <th className="px-4 py-3 text-right font-medium">Payments</th>
+              <th className="px-4 py-3 text-right font-medium">30 Day Payment Volume</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border)]">
@@ -155,35 +156,42 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
                 </td>
               </tr>
             ) : (
-              filtered.map((coin) => (
-                <tr key={coin.symbol} className="hover:bg-white/[0.02]">
-                  <td className="w-12 px-3 py-4 text-right align-top font-mono text-xs text-[var(--muted)]">
-                    {coin.rank}
-                  </td>
-                  <td className="px-4 py-4 align-top">
-                    <div className="font-semibold">{coin.symbol}</div>
-                  </td>
-                  <td className="px-4 py-4 align-top text-[var(--muted)]">
-                    {coin.name}
-                  </td>
-                  <td className="px-4 py-4 align-top">
-                    <CurrencyPill currency={coin.currency} symbol={coin.symbol} />
-                  </td>
-                  <td className="px-4 py-4 align-top">
-                    <div className="flex flex-wrap items-center gap-2">
-                      {coin.chains.map((chain) => (
-                        <ChainBadge key={chain} name={chain} />
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-right align-top font-mono">
-                    {formatUsd(coin.marketCapUsd)}
-                  </td>
-                  <td className="px-4 py-4 text-right align-top font-mono text-[var(--muted)]">
-                    -
-                  </td>
-                </tr>
-              ))
+              filtered.map((coin) => {
+                const m = getMetrics(coin.symbol);
+                return (
+                  <tr key={coin.symbol} className="hover:bg-white/[0.02]">
+                    <td className="w-12 px-3 py-4 text-right align-top font-mono text-xs text-[var(--muted)]">
+                      {coin.rank}
+                    </td>
+                    <td className="px-4 py-4 align-top">
+                      <div className="font-semibold">{coin.symbol}</div>
+                    </td>
+                    <td className="px-4 py-4 align-top text-[var(--muted)]">
+                      {coin.name}
+                    </td>
+                    <td className="px-4 py-4 align-top">
+                      <CurrencyPill currency={coin.currency} symbol={coin.symbol} />
+                    </td>
+                    <td className="px-4 py-4 align-top">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {coin.chains.map((chain) => (
+                          <ChainBadge key={chain} name={chain} />
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-right align-top font-mono">
+                      {formatUsd(coin.marketCapUsd)}
+                    </td>
+                    <td
+                      className={`px-4 py-4 text-right align-top font-mono ${
+                        m.volume30dUsd ? "" : "text-[var(--muted)]"
+                      }`}
+                    >
+                      {m.volume30dUsd ? formatUsd(m.volume30dUsd) : "-"}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
