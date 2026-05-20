@@ -87,6 +87,10 @@ function parseCsv(csv: string): Stablecoin[] {
       } satisfies Stablecoin;
     })
     .filter((s): s is Stablecoin => s !== null)
+    .filter((s) => {
+      const sym = s.symbol.toUpperCase();
+      return sym !== "AUSD" && sym !== "EUROB";
+    })
     .sort((a, b) => b.marketCapUsd - a.marketCapUsd);
 }
 
