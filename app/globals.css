@@ -3,19 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --background: #0b0d12;
+  --background: #07090e;
   --foreground: #e7ecf3;
   --muted: #8b95a7;
-  --border: #1f2430;
-  --card: #11141b;
-  --accent: #6ea8ff;
+  --border: #1d2330;
+  --card: #10141d;
+  --accent: #2dd4bf; /* reef teal */
+  --accent-soft: rgba(45, 212, 191, 0.12);
 }
 
 html,
 body {
-  background: var(--background);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, var(--accent-soft), transparent 60%),
+    var(--background);
   color: var(--foreground);
   font-family:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, "Noto Sans", sans-serif;
+  min-height: 100vh;
 }

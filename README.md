@@ -1,8 +1,12 @@
-# SDF Group 19 — Non-USD / Non-EUR Stablecoin Directory
+# Stable Reef
 
-A simple Next.js + Tailwind site that lists fiat- and treasury-backed
-stablecoins outside of USD and EUR, the chains they live on, approximate
-TVL, and the payment corridors they focus on.
+A directory of fiat- and treasury-backed stablecoins outside of USD and EUR —
+the chains they live on, approximate TVL, and the payment corridors they focus
+on.
+
+Built with Next.js + Tailwind, deployed on Vercel.
+
+Live: https://sdf-group19.vercel.app
 
 The current data is **sample / placeholder** to prove out the layout. Edit
 `lib/stablecoins.ts` to update the list — the page picks it up automatically.
@@ -24,9 +28,11 @@ Then open http://localhost:3000.
 SDFGroup19/
 ├── app/
 │   ├── globals.css        # Tailwind + theme variables
-│   ├── layout.tsx         # Root HTML layout
+│   ├── icon.svg           # Favicon (Stable Reef mark)
+│   ├── layout.tsx         # Root HTML layout + metadata
 │   └── page.tsx           # Home page
 ├── components/
+│   ├── Logo.tsx           # Stable Reef logo + wordmark
 │   └── StablecoinTable.tsx
 ├── lib/
 │   └── stablecoins.ts     # ← edit this to add / change rows
@@ -57,6 +63,6 @@ Commit and push — Vercel auto-redeploys.
 
 ## Deploying
 
-Vercel is already connected to this repo. As soon as a commit lands on
-`main`, Vercel builds and deploys it. No environment variables are needed
-for the current build.
+Vercel is connected to this repo. As soon as a commit lands on `main`,
+Vercel builds and deploys it. No environment variables are needed for the
+current build.
