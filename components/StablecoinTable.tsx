@@ -23,6 +23,7 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
         <thead className="bg-black/20">
           <tr className="text-left text-xs uppercase tracking-wider text-[var(--muted)]">
             <th className="px-4 py-3 font-medium">Token</th>
+            <th className="px-4 py-3 font-medium">Issuer</th>
             <th className="px-4 py-3 font-medium">Currency</th>
             <th className="px-4 py-3 font-medium">Chains</th>
             <th className="px-4 py-3 text-right font-medium">TVL</th>
@@ -34,8 +35,8 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
             <tr key={coin.symbol} className="hover:bg-white/[0.02]">
               <td className="px-4 py-4 align-top">
                 <div className="font-semibold">{coin.symbol}</div>
-                <div className="text-xs text-[var(--muted)]">{coin.name}</div>
               </td>
+              <td className="px-4 py-4 align-top text-[var(--muted)]">{coin.name}</td>
               <td className="px-4 py-4 align-top">
                 <Pill>{coin.currency}</Pill>
               </td>
