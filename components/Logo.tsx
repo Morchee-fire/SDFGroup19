@@ -37,12 +37,16 @@ export function LogoMark({ className, size = 32 }: LogoProps) {
 
 /**
  * Full lockup: logo mark + "Stable Reef" wordmark.
+ * Sized for use as the primary site brand in the page header.
  */
 export default function Logo({ className }: { className?: string }) {
   return (
-    <div className={`flex items-center gap-3 ${className ?? ""}`}>
-      <LogoMark className="text-[var(--accent)]" size={36} />
-      <span className="text-xl font-semibold tracking-tight">
+    <div className={`flex items-center gap-4 sm:gap-5 ${className ?? ""}`}>
+      <LogoMark
+        className="text-[var(--accent)] h-20 w-20 sm:h-28 sm:w-28"
+        size={128}
+      />
+      <span className="text-4xl font-semibold tracking-tight sm:text-6xl">
         Stable<span className="text-[var(--accent)]">Reef</span>
       </span>
     </div>
