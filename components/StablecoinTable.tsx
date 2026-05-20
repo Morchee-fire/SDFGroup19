@@ -17,6 +17,49 @@ function Pill({ children }: { children: React.ReactNode }) {
   );
 }
 
+const currencyToCountry: Record<string, string> = {
+  MXN: "mx", BRL: "br", SGD: "sg", IDR: "id", TRY: "tr", CAD: "ca",
+  JPY: "jp", NZD: "nz", ZAR: "za", HKD: "hk", GBP: "gb", AUD: "au",
+  CHF: "ch", CNY: "cn", INR: "in", KRW: "kr", THB: "th", PHP: "ph",
+  MYR: "my", VND: "vn", AED: "ae", SAR: "sa", ILS: "il", NGN: "ng",
+  KES: "ke", GHS: "gh", EGP: "eg", ARS: "ar", COP: "co", CLP: "cl",
+  PEN: "pe", UYU: "uy", PLN: "pl", SEK: "se", NOK: "no", DKK: "dk",
+  CZK: "cz", HUF: "hu", RUB: "ru", UAH: "ua", RON: "ro", TWD: "tw",
+  BGN: "bg", ISK: "is", PKR: "pk", BDT: "bd", LKR: "lk", VES: "ve",
+  MAD: "ma", DZD: "dz", TND: "tn", ETB: "et", QAR: "qa", KWD: "kw",
+  BHD: "bh", OMR: "om", JOD: "jo", LBP: "lb",
+};
+
+function resolveCountry(currency: string, symbol: string): string | null {
+  const direct = currencyToCountry[currency?.toUpperCase()];
+  if (direct) return direct;
+  const s = symbol.toUpperCase();
+  for (const [code, cc] of Object.entries(currencyToCountry)) {
+    if (s.includes(code)) return cc;
+  }
+  return null;
+}
+
+function CurrencyPill({ currency, symbol }: { currency: string; symbol: string }) {
+  const cc = resolveCountry(currency, symbol);
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-2.5 py-0.5 text-xs text-[var(--foreground)]">
+      {cc && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={`https://flagcdn.com/w40/${cc}.png`}
+          srcSet={`https://flagcdn.com/w80/${cc}.png 2x`}
+          width={20}
+          height={15}
+          alt={`${currency} flag`}
+          className="h-[15px] w-[20px] rounded-[2px] object-cover"
+        />
+      )}
+      {currency}
+    </span>
+  );
+}
+
 function ChainBadge({ name }: { name: string }) {
   const icon = ChainIcon({ name, size: 22 });
   if (icon) {
@@ -57,7 +100,7 @@ export default function StablecoinTable({ rows }: { rows: Stablecoin[] }) {
                 {coin.name}
               </td>
               <td className="px-4 py-4 align-top">
-                <Pill>{coin.currency}</Pill>
+                <CurrencyPill currency={coin.currency} symbol={coin.symbol} />
               </td>
               <td className="px-4 py-4 align-top">
                 <div className="flex flex-wrap items-center gap-2">
