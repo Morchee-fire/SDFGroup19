@@ -1,5 +1,9 @@
 const SHEET_ID = "1W6-vyIHYn7_mWmfjcemLRT7nSKZmaBRsd6tDaf09aws";
-const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
+// gid=531643817 is the tab with the per-coin summary including the
+// "Market Cap (USD)" column (column J). The default tab (gid=0) only has
+// per-chain contract addresses and no market cap.
+const SHEET_GID = "531643817";
+const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
 
 export type Stablecoin = {
   category: string;
@@ -118,24 +122,40 @@ function splitCsvLine(line: string): string[] {
 }
 
 function parseCurrency(s: string): string {
-  // "BRL (Brazilian Real)" → "BRL", "USD" → "USD"
   return s.split(/[\s(]/)[0].trim();
 }
 
 function parseChains(s: string): string[] {
-  // Strip parenthetical notes e.g. "Polygon (issuer also lists ...)" → "Polygon"
   return s
     .split(",")
     .map((c) => c.replace(/\s*\(.*?\)/g, "").trim())
     .filter(Boolean);
 }
 
+// Parse a market cap cell. Any non-numeric string (e.g. "Small", "Limited
+// public data", "Pre-launch", "Recently announced", "TBD") returns 0, which
+// the table renders as "-".
 function parseMarketCap(s: string): number {
-  if (!s || s.toLowerCase() === "limited") return 0;
-  // Handle ranges like "~$18-26,000,000" — take the lower bound
-  const clean = s.replace(/[~$,\s]/g, "").toUpperCase().split("-")[0];
-  if (clean.endsWith("B")) return parseFloat(clean) * 1_000_000_000;
-  if (clean.endsWith("M")) return parseFloat(clean) * 1_000_000;
-  if (clean.endsWith("K")) return parseFloat(clean) * 1_000;
-  return parseFloat(clean) || 0;
+  if (!s) return 0;
+  const lower = s.toLowerCase();
+  if (lower === "limited" || lower.includes("limited") || lower.includes("small") ||
+      lower.includes("pre-launch") || lower.includes("recently") ||
+      lower.includes("target") || lower.includes("tbd")) {
+    return 0;
+  }
+  // Handle ranges like "~$18-26,000,000" — take the lower bound and re-apply
+  // the trailing suffix (the suffix is on the last number, but we want it on
+  // the first to match the user's likely intent).
+  const stripped = s.replace(/[~$,\s]/g, "").toUpperCase();
+  const lowerBound = stripped.split("-")[0];
+  // Try suffix on the lower bound directly first
+  for (const [suffix, mult] of [["B", 1e9], ["M", 1e6], ["K", 1e3]] as const) {
+    if (lowerBound.endsWith(suffix)) return parseFloat(lowerBound) * mult;
+  }
+  // If the lower bound has no suffix but the full stripped string does
+  // (e.g. "18-26000000"), check whether the upper bound is large — if so the
+  // lower is in the same magnitude and we can use it raw.
+  const n = parseFloat(lowerBound);
+  if (!Number.isFinite(n)) return 0;
+  return n;
 }

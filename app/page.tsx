@@ -1,25 +1,14 @@
 import Logo from "@/components/Logo";
 import StablecoinTable from "@/components/StablecoinTable";
 import { fetchStablecoins, type Stablecoin } from "@/lib/stablecoins";
-import { fetchAllMarketCaps } from "@/lib/marketcap";
 
-// Render at request time (with Next's fetch cache), not at build time.
-// External APIs (Google Sheets, CoinGecko, etc.) can be slow or briefly
-// unreachable during the Vercel build, which would otherwise fail the deploy.
+// Render at request time, not at build time. The Google Sheets fetch can be
+// slow or briefly unreachable during the Vercel build, which would otherwise
+// fail the deploy.
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [stablecoins, marketCaps] = await Promise.all([
-    fetchStablecoins().catch((): Stablecoin[] => []),
-    fetchAllMarketCaps().catch(() => ({} as Record<string, number>)),
-  ]);
-  const coins = stablecoins.map((c) => ({
-    ...c,
-    marketCapUsd:
-      (marketCaps[c.symbol] ?? 0) > 0
-        ? marketCaps[c.symbol]
-        : c.marketCapUsd,
-  }));
+  const coins = await fetchStablecoins().catch((): Stablecoin[] => []);
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
